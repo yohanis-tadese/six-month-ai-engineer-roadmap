@@ -2,11 +2,18 @@ const Storage = {
   KEY: 'ai_roadmap_v2',
 
   getDefault() {
+    // Default start date = next Monday from today
+    const now = new Date();
+    const day = now.getDay(); // 0=Sun, 1=Mon ... 6=Sat
+    const daysUntilMon = day === 0 ? 1 : day === 1 ? 0 : 8 - day;
+    const nextMon = new Date(now);
+    nextMon.setDate(now.getDate() + daysUntilMon);
     return {
       completedTopics: [],
+      usedResources: [],
       settings: {
         name: 'AI Engineer',
-        startDate: new Date().toISOString().split('T')[0]
+        startDate: nextMon.toISOString().split('T')[0]
       }
     };
   },
@@ -24,6 +31,7 @@ const Storage = {
       return {
         ...defaults,
         ...parsed,
+        usedResources: parsed.usedResources || [],
         settings: { ...defaults.settings, ...(parsed.settings || {}) }
       };
     } catch (e) {
@@ -54,6 +62,22 @@ const Storage = {
 
   isTopicDone(topicId) {
     return this.load().completedTopics.includes(topicId);
+  },
+
+  toggleUsed(resourceId) {
+    const data = this.load();
+    const idx = data.usedResources.indexOf(resourceId);
+    if (idx === -1) {
+      data.usedResources.push(resourceId);
+    } else {
+      data.usedResources.splice(idx, 1);
+    }
+    this.save(data);
+    return data.usedResources.includes(resourceId);
+  },
+
+  isUsed(resourceId) {
+    return this.load().usedResources.includes(resourceId);
   },
 
   saveSettings(settings) {

@@ -26,16 +26,16 @@ const CODING_SESSIONS = {
     ]
   },
   m1_w3: {
-    title: 'Build a Structured AI Chatbot with Memory',
-    why: 'This is the core skill of LLM engineering: calling the API, managing conversation history, and forcing structured output.',
-    concepts: ['System prompts', 'Conversation history', 'JSON output mode', 'Function calling', 'Model selection'],
-    outcome: 'A CLI chatbot that remembers the conversation and can answer in plain text OR structured JSON when asked.',
+    title: 'Build a Secure, Structured AI Chatbot',
+    why: 'Every production LLM endpoint needs three layers: input validation, conversation management, and output parsing. Building all three in one session makes them stick.',
+    concepts: ['System prompts', 'Conversation history', 'Prompt injection', 'JSON output mode', 'Output validation'],
+    outcome: 'A CLI chatbot with conversation memory, a 3-layer input guard against prompt injection, and reliable JSON output with automatic retry on parse failure.',
     tasks: [
-      { id: 'cs_m1_w3_t1', text: 'Set up OpenAI SDK and write a basic single-message API call' },
-      { id: 'cs_m1_w3_t2', text: 'Wrap it in a conversation loop that keeps full message history' },
-      { id: 'cs_m1_w3_t3', text: 'Add a system prompt that gives the bot a personality and response rules' },
-      { id: 'cs_m1_w3_t4', text: 'Add a /json command that forces the bot to reply with structured JSON output' },
-      { id: 'cs_m1_w3_t5', text: 'Add a /tool command that simulates a function call: bot calls a fake get_weather tool' },
+      { id: 'cs_m1_w3_t1', text: 'Set up OpenAI SDK, write a conversation loop that maintains full message history across turns' },
+      { id: 'cs_m1_w3_t2', text: 'Add a system prompt with clear constraints — then run 5 prompt injection attempts against it and document which succeed' },
+      { id: 'cs_m1_w3_t3', text: 'Build an input guard function: reject messages containing "ignore instructions", "reveal system prompt", or similar injection patterns' },
+      { id: 'cs_m1_w3_t4', text: 'Add a /json command that forces structured output — implement retry-on-parse-failure: retry up to 3 times if JSON.parse() throws' },
+      { id: 'cs_m1_w3_t5', text: 'Add a PII check: if user input contains an email or phone number pattern, warn the user before sending to the API' },
     ]
   },
   m2_w1: {
@@ -52,16 +52,16 @@ const CODING_SESSIONS = {
     ]
   },
   m2_w2: {
-    title: 'Build a Full RAG Pipeline (No Framework)',
-    why: 'Building RAG without LangChain or LlamaIndex forces you to understand every step — retrieval quality, context injection, source tracking.',
-    concepts: ['Similarity search', 'Metadata filtering', 'Hybrid search', 'Hallucination prevention', 'pgvector'],
-    outcome: 'A question-answering system that reads a PDF, stores embeddings in pgvector, retrieves relevant chunks, and cites sources in every answer.',
+    title: 'Build a Full RAG Pipeline with Reranking',
+    why: 'Building RAG without a framework forces you to understand every step. Adding reranking reveals the quality gap between naive retrieval and production retrieval.',
+    concepts: ['Similarity search', 'Metadata filtering', 'Hybrid search', 'Reranking', 'pgvector'],
+    outcome: 'A RAG system that reads a PDF, stores embeddings in pgvector, retrieves with hybrid search, reranks with Cohere, and cites sources in every answer.',
     tasks: [
       { id: 'cs_m2_w2_t1', text: 'Parse a PDF into plain text using pdf-parse (Node.js) or PyMuPDF (Python)' },
       { id: 'cs_m2_w2_t2', text: 'Chunk the text and store embeddings in a pgvector table with source + page metadata' },
-      { id: 'cs_m2_w2_t3', text: 'Write a retrieval function: embed the query, find top 5 nearest chunks using pgvector' },
-      { id: 'cs_m2_w2_t4', text: 'Build the answer prompt: inject chunks + tell the model to cite its sources' },
-      { id: 'cs_m2_w2_t5', text: 'Test with 10 questions — check for hallucinations and measure retrieval accuracy' },
+      { id: 'cs_m2_w2_t3', text: 'Write a retrieval function: embed the query, find top 20 nearest chunks using pgvector' },
+      { id: 'cs_m2_w2_t4', text: 'Add Cohere Rerank: pass your top-20 chunks to the Cohere Rerank API — receive top-5 reranked results and compare quality before vs. after on 10 questions' },
+      { id: 'cs_m2_w2_t5', text: 'Build the answer prompt: inject top-5 reranked chunks + enforce source citation (document name + page number) in every response' },
     ]
   },
   m2_w3: {
@@ -78,16 +78,16 @@ const CODING_SESSIONS = {
     ]
   },
   m3_w1: {
-    title: 'Build a ReAct Agent with 2 Tools',
-    why: 'Building your first agent with LangChain shows you the Reason-Act-Observe loop that every AI automation system uses.',
-    concepts: ['Agent loop', 'Tools', 'ReAct pattern', 'LangChain', 'Conversation memory'],
-    outcome: 'A LangChain agent that can use a calculator and a web search tool to answer multi-step questions.',
+    title: 'Build a ReAct Agent from Scratch, Then with LangChain',
+    why: 'Understanding the agent loop before using a framework means you can debug anything. Build it from scratch first — LangChain second.',
+    concepts: ['Agent loop', 'ReAct pattern', 'Tool calling', 'Iteration limits', 'LangChain comparison'],
+    outcome: 'A working ReAct agent built with only a while loop and API calls, then rebuilt with LangChain — with a written comparison of what each approach abstracts.',
     tasks: [
-      { id: 'cs_m3_w1_t1', text: 'Set up LangChain and define a calculator tool that evaluates math expressions' },
-      { id: 'cs_m3_w1_t2', text: 'Add a web search tool using SerpAPI or DuckDuckGo search' },
-      { id: 'cs_m3_w1_t3', text: 'Create a ReAct agent and test it with a multi-step question (e.g. "What is the GDP of France divided by its population?")' },
-      { id: 'cs_m3_w1_t4', text: 'Add conversation memory so the agent remembers the last 5 messages' },
-      { id: 'cs_m3_w1_t5', text: 'Re-build the same agent WITHOUT LangChain (just a while loop + API calls) to see what LangChain is really doing' },
+      { id: 'cs_m3_w1_t1', text: 'Write a ReAct agent from scratch: a while loop that calls the LLM, parses tool calls from the response text, executes them, and feeds results back' },
+      { id: 'cs_m3_w1_t2', text: 'Add two tools: calculator (evaluates math expressions) and web search (DuckDuckGo API) — log the full Reason → Act → Observe cycle to the console' },
+      { id: 'cs_m3_w1_t3', text: 'Test with a multi-step question requiring both tools (e.g. "What is the population of France times the GDP per capita of Germany?")' },
+      { id: 'cs_m3_w1_t4', text: 'Add a max_iterations=10 limit and a graceful failure message: "Could not complete this task in the allowed steps"' },
+      { id: 'cs_m3_w1_t5', text: 'Rebuild the same agent using LangChain — compare code length side-by-side and write a one-paragraph explanation of what LangChain abstracted' },
     ]
   },
   m3_w2: {
@@ -117,29 +117,29 @@ const CODING_SESSIONS = {
     ]
   },
   m4_w1: {
-    title: 'Build a Secure, Rate-Limited AI API',
-    why: 'Security and rate limiting are non-negotiable in production. One unprotected endpoint can drain your API budget overnight.',
-    concepts: ['JWT authentication', 'Rate limiting', 'Input validation', 'Security middleware', 'Background queues'],
-    outcome: 'A hardened AI endpoint with JWT auth, rate limiting, sanitized inputs, and structured error responses.',
+    title: 'Build a Secure AI API with PII Filtering and Injection Defense',
+    why: 'Security and rate limiting are non-negotiable in production. Prompt injection and PII leakage are the two most common AI-specific vulnerabilities — fix both.',
+    concepts: ['JWT authentication', 'Rate limiting', 'PII redaction', 'Prompt injection defense', 'OWASP LLM Top 10'],
+    outcome: 'A hardened AI endpoint with JWT auth, rate limiting, Presidio PII redaction, and a 3-layer prompt injection defense — tested against 5 real injection attempts.',
     tasks: [
-      { id: 'cs_m4_w1_t1', text: 'Add JWT authentication middleware to an existing AI endpoint' },
-      { id: 'cs_m4_w1_t2', text: 'Implement rate limiting: block any user who exceeds 20 requests per minute' },
-      { id: 'cs_m4_w1_t3', text: 'Add input validation: reject empty prompts, prompts over 2000 chars, and dangerous patterns' },
-      { id: 'cs_m4_w1_t4', text: 'Add a BullMQ + Redis background queue for long-running AI tasks' },
-      { id: 'cs_m4_w1_t5', text: 'Test security edge cases: expired JWT, exceeded rate limit, malformed JSON — confirm clean errors' },
+      { id: 'cs_m4_w1_t1', text: 'Add JWT authentication middleware using httpOnly cookies (not Authorization header) to an existing AI endpoint' },
+      { id: 'cs_m4_w1_t2', text: 'Implement rate limiting: block users who exceed 20 requests per minute with a clean 429 response and retry-after header' },
+      { id: 'cs_m4_w1_t3', text: 'Install Microsoft Presidio: add PII redaction middleware that detects and masks emails, phone numbers, and SSNs from user input before the LLM call' },
+      { id: 'cs_m4_w1_t4', text: 'Add a BullMQ + Redis background queue for long-running AI tasks — document processing must not block the HTTP response' },
+      { id: 'cs_m4_w1_t5', text: 'Run 5 prompt injection attempts against your secured endpoint — document which succeed and add input guards to block all of them' },
     ]
   },
   m4_w2: {
-    title: 'Dockerize an AI App with Full Logging',
-    why: 'Docker makes your app run identically everywhere. Logging makes it debuggable. Together they are what separates hobby projects from production systems.',
-    concepts: ['Docker', 'docker-compose', 'CI/CD', 'Structured logging', 'Cost tracking'],
-    outcome: 'A Dockerized AI app with structured logging on every AI call, a cost tracking middleware, and a GitHub Actions deploy workflow.',
+    title: 'Dockerize an AI App with Langfuse Observability',
+    why: 'Docker makes your app run identically everywhere. Langfuse makes every AI call visible. Together they are what separate hobby projects from production systems.',
+    concepts: ['Docker', 'docker-compose', 'CI/CD', 'Langfuse tracing', 'Cost alerts'],
+    outcome: 'A Dockerized AI app with Langfuse tracing on every LLM call, a Slack cost alert when daily spend exceeds $5, and a GitHub Actions CI/CD pipeline.',
     tasks: [
-      { id: 'cs_m4_w2_t1', text: 'Write a Dockerfile for your Node.js AI app (multi-stage build)' },
-      { id: 'cs_m4_w2_t2', text: 'Write a docker-compose.yml that spins up: app + PostgreSQL + Redis together' },
-      { id: 'cs_m4_w2_t3', text: 'Add structured logging to every AI call: log model, tokens, latency, and user ID' },
-      { id: 'cs_m4_w2_t4', text: 'Build a cost tracking middleware: calculate USD cost per request and store in DB' },
-      { id: 'cs_m4_w2_t5', text: 'Set up a GitHub Actions workflow: on push to main → run tests → build Docker image → deploy' },
+      { id: 'cs_m4_w2_t1', text: 'Write a Dockerfile for your Node.js AI app using a multi-stage build for a smaller production image' },
+      { id: 'cs_m4_w2_t2', text: 'Write a docker-compose.yml that spins up: app + PostgreSQL + Redis + Langfuse together with one command' },
+      { id: 'cs_m4_w2_t3', text: 'Integrate Langfuse: add tracing to every LLM call — open the Langfuse UI and verify each trace shows model, tokens, latency, and user ID' },
+      { id: 'cs_m4_w2_t4', text: 'Build a cost alert: calculate running daily spend in a middleware — fire a Slack webhook notification when it exceeds $5' },
+      { id: 'cs_m4_w2_t5', text: 'Set up GitHub Actions: on push to main → run tests → build Docker image → deploy to Railway with environment variables injected from secrets' },
     ]
   },
   m4_w3: {
@@ -192,6 +192,32 @@ const CODING_SESSIONS = {
       { id: 'cs_m6_w1_t3', text: 'Identify 3 scaling bottlenecks and write one sentence on how you would fix each' },
       { id: 'cs_m6_w1_t4', text: 'Calculate monthly API cost at 1k users, 10k users, and 100k users' },
       { id: 'cs_m6_w1_t5', text: 'Write a one-page technical design doc: problem, solution, components, tradeoffs, what you would do differently' },
+    ]
+  },
+  m5_w3: {
+    title: 'Run Local AI Models with Ollama',
+    why: 'Local models eliminate API costs and privacy concerns. Every professional AI engineer should know how to run and evaluate open-source models for the right use cases.',
+    concepts: ['Ollama', 'GGUF quantization', 'Hugging Face Hub', 'Local inference', 'Model comparison'],
+    outcome: 'A local AI chat CLI powered by Llama 3.2 via Ollama, plus a written benchmark comparing it to GPT-4o on 10 identical prompts across speed, quality, and cost.',
+    tasks: [
+      { id: 'cs_m5_w3_t1', text: 'Install Ollama and run `ollama run llama3.2` — test with 10 prompts and measure average response time vs. GPT-4o' },
+      { id: 'cs_m5_w3_t2', text: 'Build a local chat CLI using Ollama\'s OpenAI-compatible API: replace base_url with http://localhost:11434/v1 — no other code changes needed' },
+      { id: 'cs_m5_w3_t3', text: 'Pull Llama 3.2 and Mistral — run the same 5 prompts on both and document quality differences in format, accuracy, and tone' },
+      { id: 'cs_m5_w3_t4', text: 'Search Hugging Face Hub for the top 3 text embedding models by download count — compare their model cards, context windows, and benchmark scores' },
+      { id: 'cs_m5_w3_t5', text: 'Write a decision matrix: for each of your 5 projects, evaluate whether a local model would work — document privacy, cost, quality, and latency tradeoffs' },
+    ]
+  },
+  m6_w3: {
+    title: 'Fine-Tune a Model for a Specific Task',
+    why: 'Knowing when and how to fine-tune separates a junior AI engineer from a senior one. Building it once makes the decision framework concrete and the process familiar.',
+    concepts: ['Fine-tuning', 'JSONL dataset', 'LoRA', 'Model evaluation', 'Fine-tuning vs. RAG'],
+    outcome: 'A fine-tuned OpenAI model trained on a customer support dataset, evaluated against the base model on 20 test cases with documented score comparison.',
+    tasks: [
+      { id: 'cs_m6_w3_t1', text: 'Prepare a fine-tuning dataset in JSONL format: 50 customer support (system, user, assistant) pairs — prioritize quality and variety over quantity' },
+      { id: 'cs_m6_w3_t2', text: 'Validate the dataset format using the OpenAI CLI validation tool — fix any formatting errors before submitting' },
+      { id: 'cs_m6_w3_t3', text: 'Submit a fine-tuning job via the OpenAI API — monitor training progress in the dashboard and note the total cost' },
+      { id: 'cs_m6_w3_t4', text: 'Run the base model and the fine-tuned model on 20 held-out test cases — score both on accuracy, format adherence, and tone — document the difference' },
+      { id: 'cs_m6_w3_t5', text: 'Write your conclusion: did fine-tuning justify the cost and effort for this use case? When would you use it vs. RAG vs. prompt engineering?' },
     ]
   },
   m6_w2: {
@@ -269,10 +295,11 @@ const App = {
     main.innerHTML = '<div class="page-loader"><div class="spinner"></div></div>';
     setTimeout(() => {
       switch (page) {
-        case 'dashboard': main.innerHTML = this.renderDashboard(); break;
-        case 'roadmap':   main.innerHTML = this.renderRoadmap(); break;
-        case 'settings':  main.innerHTML = this.renderSettings(); break;
-        default:          main.innerHTML = this.renderDashboard();
+        case 'dashboard':  main.innerHTML = this.renderDashboard(); break;
+        case 'roadmap':    main.innerHTML = this.renderRoadmap(); break;
+        case 'resources':  main.innerHTML = this.renderResources(); break;
+        case 'settings':   main.innerHTML = this.renderSettings(); break;
+        default:           main.innerHTML = this.renderDashboard();
       }
       this.bindPageEvents(page);
       this.updateSidebarProgress();
@@ -288,8 +315,9 @@ const App = {
   },
 
   bindPageEvents(page) {
-    if (page === 'roadmap') this.bindRoadmapEvents();
-    if (page === 'settings') this.bindSettingsEvents();
+    if (page === 'roadmap')    this.bindRoadmapEvents();
+    if (page === 'resources')  this.bindResourcesEvents();
+    if (page === 'settings')   this.bindSettingsEvents();
   },
 
   /* ────────────────────────────────────────
@@ -418,7 +446,7 @@ const App = {
                       style="--tab-color:${m.color}">
                 <span class="tab-num">M${m.id}</span>
                 <span class="tab-title">${m.title.split(':')[0].trim()}</span>
-                <span class="tab-prog">${mp}%</span>
+                ${mp > 0 ? `<span class="tab-prog">${mp}%</span>` : ''}
               </button>
             `;
           }).join('')}
@@ -431,7 +459,7 @@ const App = {
     `;
   },
 
-  getMonthWeeks(month) {
+  getMonthWeeks(month, startDate, today) {
     const monthId = month.id;
     const learnSections = month.sections.filter(s => s.type !== 'project');
     const projectSections = month.sections.filter(s => s.type === 'project');
@@ -441,9 +469,8 @@ const App = {
       section.topics.forEach(topic => allLearning.push({ topic, section }));
     });
 
-    // Every weekday: 1.5h reading + 1.5h coding = 3h total
-    // If section has no code tasks: 3h reading instead
     const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    const globalWeekBase = (monthId - 1) * 4;
 
     const makeDayMeta = (section) => {
       const hasCoding = section && section.note && section.note.code && section.note.code.length > 0;
@@ -452,9 +479,22 @@ const App = {
         : { readHours: '3h',   codeHours: null,    totalHours: '3h' };
     };
 
+    // dateInfo for a given global week + day-of-week index (0=Mon … 6=Sun)
+    const makeDateInfo = (globalWeek, dayIndex) => {
+      if (!startDate) return null;
+      const d = new Date(startDate);
+      d.setDate(d.getDate() + globalWeek * 7 + dayIndex);
+      d.setHours(0, 0, 0, 0);
+      const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const isToday = today ? d.getTime() === today.getTime() : false;
+      const isPast  = today ? d.getTime() < today.getTime() : false;
+      return { label, isToday, isPast };
+    };
+
     const weeks = [];
 
     for (let w = 0; w < 3; w++) {
+      const globalWeek = globalWeekBase + w;
       const items = allLearning.slice(w * 5, (w + 1) * 5);
       if (items.length > 0 || w === 0) {
         weeks.push({
@@ -463,14 +503,16 @@ const App = {
           type: 'learning',
           days: items.map((item, i) => ({
             label: dayLabels[i],
+            dateInfo: makeDateInfo(globalWeek, i),
             topic: item.topic,
             section: item.section,
             ...makeDayMeta(item.section)
           })),
           emptyDayLabels: dayLabels.slice(items.length),
+          emptyDayDates: dayLabels.slice(items.length).map((_, i) => makeDateInfo(globalWeek, items.length + i)),
           weekend: {
-            sat: { hours: '5h', task: 'Full Coding Session', desc: 'Re-implement topics from the week, build mini-projects, practice exercises' },
-            sun: { hours: '5h', task: 'Full Coding Session', desc: 'Review & extend Saturday\'s work, document what you built, plan next week' }
+            sat: { hours: '5h', task: 'Full Coding Session', desc: 'Re-implement topics from the week, build mini-projects, practice exercises', dateInfo: makeDateInfo(globalWeek, 5) },
+            sun: { hours: '5h', task: 'Full Coding Session', desc: "Review & extend Saturday's work, document what you built, plan next week", dateInfo: makeDateInfo(globalWeek, 6) }
           }
         });
       }
@@ -483,6 +525,7 @@ const App = {
       ...extraLearning.map(i => ({ topic: i.topic, section: i.section })),
       ...allProjectItems
     ];
+    const gw4 = globalWeekBase + 3;
 
     weeks.push({
       number: 4,
@@ -491,6 +534,7 @@ const App = {
       projectSection: projectSections[0] || null,
       days: allWeek4.slice(0, 5).map((item, i) => ({
         label: dayLabels[i],
+        dateInfo: makeDateInfo(gw4, i),
         topic: item.topic,
         section: item.section,
         readHours: '1.5h',
@@ -499,8 +543,8 @@ const App = {
       })),
       extraTasks: allWeek4.slice(5),
       weekend: {
-        sat: { hours: '5h', task: 'Full Project Build', desc: 'Complete remaining features, refactor, improve UX and code quality' },
-        sun: { hours: '5h', task: 'Deploy & Document', desc: 'Write README, record demo video, deploy to production, publish on GitHub' }
+        sat: { hours: '5h', task: 'Full Project Build', desc: 'Complete remaining features, refactor, improve UX and code quality', dateInfo: makeDateInfo(gw4, 5) },
+        sun: { hours: '5h', task: 'Deploy & Document', desc: 'Write README, record demo video, deploy to production, publish on GitHub', dateInfo: makeDateInfo(gw4, 6) }
       }
     });
 
@@ -512,7 +556,22 @@ const App = {
     if (!month) return '';
     const data = Storage.load();
     const completed = data.completedTopics;
-    const weeks = this.getMonthWeeks(month);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let startDate = null;
+    if (data.settings.startDate) {
+      const sd = new Date(data.settings.startDate + 'T00:00:00');
+      if (!isNaN(sd.getTime())) {
+        // Always align to the nearest coming Monday so week slots map correctly
+        const dow = sd.getDay(); // 0=Sun 1=Mon … 6=Sat
+        if (dow !== 1) {
+          const daysToMon = dow === 0 ? 1 : 8 - dow;
+          sd.setDate(sd.getDate() + daysToMon);
+        }
+        startDate = sd;
+      }
+    }
+    const weeks = this.getMonthWeeks(month, startDate, today);
 
     return `
       <div class="month-content">
@@ -529,7 +588,25 @@ const App = {
 
   renderWeekend(weekend, type) {
     if (!weekend) return '';
-    const isProject = type === 'project';
+    const renderDay = (dayName, day) => {
+      const di = day.dateInfo;
+      const isToday = di && di.isToday;
+      return `
+        <div class="weekend-row${isToday ? ' topic-row-today' : ''}">
+          <div class="topic-row-main">
+            <div class="day-label${isToday ? ' day-today' : ''}">
+              <span class="day-name">${dayName}</span>
+              ${di ? `<span class="day-date-label">${di.label}</span>` : ''}
+            </div>
+            <span class="hours-pill hours-weekend">${day.hours}</span>
+            <div class="weekend-content">
+              <span class="weekend-task">${day.task}</span>
+              <span class="weekend-desc">${day.desc}</span>
+            </div>
+            ${isToday ? `<span class="day-status-badge badge-today">Today</span>` : ''}
+          </div>
+        </div>`;
+    };
     return `
       <div class="weekend-section">
         <div class="weekend-divider">
@@ -538,26 +615,8 @@ const App = {
           </span>
         </div>
         <div class="weekend-rows">
-          <div class="weekend-row">
-            <div class="topic-row-main">
-              <span class="day-label">Sat</span>
-              <span class="hours-pill hours-weekend">${weekend.sat.hours}</span>
-              <div class="weekend-content">
-                <span class="weekend-task">${weekend.sat.task}</span>
-                <span class="weekend-desc">${weekend.sat.desc}</span>
-              </div>
-            </div>
-          </div>
-          <div class="weekend-row">
-            <div class="topic-row-main">
-              <span class="day-label">Sun</span>
-              <span class="hours-pill hours-weekend">${weekend.sun.hours}</span>
-              <div class="weekend-content">
-                <span class="weekend-task">${weekend.sun.task}</span>
-                <span class="weekend-desc">${weekend.sun.desc}</span>
-              </div>
-            </div>
-          </div>
+          ${renderDay('Sat', weekend.sat)}
+          ${renderDay('Sun', weekend.sun)}
         </div>
       </div>
     `;
@@ -566,54 +625,91 @@ const App = {
   renderWeek(week, completed, color) {
     const isProject = week.type === 'project';
     const extraTasks = week.extraTasks || [];
+    const weekId = `wk-${week.monthId}-${week.number}`;
+
+    const sectionMap = new Map();
+    week.days.forEach(d => { if (d.section) sectionMap.set(d.section.id, d.section); });
+    const sections = [...sectionMap.values()];
+    const weekSubtitle = isProject && week.projectSection
+      ? week.projectSection.title
+      : sections.map(s => s.title).join(' · ');
+
+    const scheduleNote = isProject
+      ? 'Mon–Fri: 1.5h study + 3.5h build = 5h/day. Sat & Sun: 5h full project work.'
+      : 'Mon–Fri: 1.5h reading + 1.5h coding = 3h/day. Sat & Sun: 5h full coding.';
+
     return `
-      <div class="week-block ${isProject ? 'week-block-project' : ''}">
-        <div class="week-header">
+      <div class="week-block ${isProject ? 'week-block-project' : ''}" id="${weekId}">
+        <div class="week-header week-toggle-header" data-week-body="${weekId}-body">
           <div class="week-label">
             <span class="week-badge ${isProject ? 'week-badge-project' : ''}">Week ${week.number}</span>
             <span class="week-type-tag ${isProject ? 'week-type-build' : ''}">${isProject ? 'Build Week' : 'Learning Week'}</span>
+            ${weekSubtitle ? `<span class="week-subtitle">${weekSubtitle}</span>` : ''}
           </div>
-          <div class="week-day-legend">
-            ${isProject
-              ? `<span class="legend-item legend-build">Mon–Fri: 1.5h study + 3.5h build = 5h/day</span><span class="legend-item legend-weekend">Sat &amp; Sun: 5h/day full coding</span>`
-              : `<span class="legend-item legend-read">Each day: 1.5h reading + 1.5h coding = 3h</span><span class="legend-item legend-weekend">Sat &amp; Sun: 5h/day full coding</span>`
-            }
-          </div>
+          <span class="week-chevron expanded">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          </span>
         </div>
-        ${isProject && week.projectSection ? `
-          <div class="project-week-info">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/></svg>
-            ${week.projectSection.title}
-          </div>
-        ` : ''}
-        <div class="week-days">
-          ${week.days.map(day => this.renderTopicRow(day, completed, color)).join('')}
-          ${(week.emptyDayLabels || []).map(lbl => `
-            <div class="topic-row topic-row-revision">
-              <div class="topic-row-main">
-                <span class="day-label">${lbl}</span>
-                <span class="hours-pill">3h</span>
-                <span class="topic-text-muted">Catch-up &amp; revision day</span>
+
+        <div class="week-body" id="${weekId}-body">
+          <p class="week-schedule-note">${scheduleNote}</p>
+
+          <div class="daily-plan-section">
+            <button class="daily-plan-header" data-plan-body="${weekId}-plan">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+              Daily Plan
+              <span class="daily-plan-count">${week.days.length} topic${week.days.length !== 1 ? 's' : ''}</span>
+              <svg class="daily-plan-chevron" viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+            </button>
+            <div class="daily-plan-body" id="${weekId}-plan" hidden>
+              <div class="week-days">
+                ${week.days.map(day => this.renderTopicRow(day, completed, color)).join('')}
+                ${(week.emptyDayLabels || []).map((lbl, i) => {
+                  const di = week.emptyDayDates && week.emptyDayDates[i];
+                  return `
+                  <div class="topic-row topic-row-revision">
+                    <div class="topic-row-main">
+                      <div class="day-label">
+                        <span class="day-name">${lbl}</span>
+                        ${di ? `<span class="day-date-label">${di.label}</span>` : ''}
+                      </div>
+                      <span class="hours-pill">3h</span>
+                      <span class="topic-text-muted">Catch-up &amp; revision day</span>
+                    </div>
+                  </div>`;
+                }).join('')}
               </div>
             </div>
-          `).join('')}
-        </div>
-        ${extraTasks.length > 0 ? `
-          <div class="extra-tasks">
-            <div class="extra-tasks-label">${isProject ? 'Remaining build tasks' : 'Remaining tasks'}:</div>
-            ${extraTasks.map(item => {
-              const isDone = completed.includes(item.topic.id);
-              return `
-                <label class="extra-task-row ${isDone ? 'extra-task-done' : ''}">
-                  <input type="checkbox" class="topic-check" data-topic-id="${item.topic.id}" ${isDone ? 'checked' : ''}>
-                  <span>${item.topic.text}</span>
-                </label>
-              `;
-            }).join('')}
           </div>
-        ` : ''}
-        ${this.renderCodingSession(week.monthId, week.number, completed)}
-        ${this.renderWeekend(week.weekend, week.type)}
+
+          ${extraTasks.length > 0 ? `
+            <div class="extra-tasks">
+              <div class="extra-tasks-label">${isProject ? 'Remaining build tasks' : 'Remaining tasks'}:</div>
+              ${extraTasks.map(item => {
+                const isDone = completed.includes(item.topic.id);
+                return `
+                  <label class="extra-task-row ${isDone ? 'extra-task-done' : ''}">
+                    <input type="checkbox" class="topic-check" data-topic-id="${item.topic.id}" ${isDone ? 'checked' : ''}>
+                    <span>${item.topic.text}</span>
+                  </label>
+                `;
+              }).join('')}
+            </div>
+          ` : ''}
+
+          ${this.renderCodingSession(week.monthId, week.number, completed)}
+
+          <div class="week-weekend-note">
+            <div class="week-weekend-row">
+              <span class="week-weekend-label">Sat</span>
+              <span class="week-weekend-text">${week.weekend.sat.task} — ${week.weekend.sat.desc}</span>
+            </div>
+            <div class="week-weekend-row">
+              <span class="week-weekend-label">Sun</span>
+              <span class="week-weekend-text">${week.weekend.sun.task} — ${week.weekend.sun.desc}</span>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   },
@@ -628,28 +724,13 @@ const App = {
     return `
       <div class="coding-session" id="cs-${key}">
         <div class="cs-header">
-          <div class="cs-header-left">
-            <span class="cs-badge">
-              <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-              Coding Session
-            </span>
-            <span class="cs-title">${session.title}</span>
-          </div>
-          <div class="cs-progress-pill ${allDone ? 'cs-progress-done' : ''}">${doneCnt}/${session.tasks.length}</div>
+          <span class="cs-title">${session.title}</span>
+          <span class="cs-progress-pill ${allDone ? 'cs-progress-done' : ''}">${doneCnt}/${session.tasks.length}</span>
         </div>
-        <div class="cs-meta-row">
-          <div class="cs-meta-item">
-            <span class="cs-meta-label">Why build this</span>
-            <span class="cs-meta-text">${session.why}</span>
-          </div>
-          <div class="cs-meta-item">
-            <span class="cs-meta-label">Concepts applied</span>
-            <div class="cs-concepts">${session.concepts.map(c => `<span class="cs-concept-tag">${c}</span>`).join('')}</div>
-          </div>
-          <div class="cs-meta-item">
-            <span class="cs-meta-label">Expected outcome</span>
-            <span class="cs-meta-text cs-outcome">${session.outcome}</span>
-          </div>
+        <div class="cs-context">
+          <p class="cs-why">${session.why}</p>
+          <div class="cs-concepts">${session.concepts.map(c => `<span class="cs-concept-tag">${c}</span>`).join('')}</div>
+          <p class="cs-outcome-text">${session.outcome}</p>
         </div>
         <div class="cs-tasks">
           ${session.tasks.map(task => {
@@ -677,10 +758,23 @@ const App = {
     const hoursTitle = hasCoding
       ? `${day.readHours} reading + ${day.codeHours} coding`
       : `${day.readHours} reading`;
+
+    const di = day.dateInfo;
+    const isToday  = di && di.isToday;
+    const isMissed = di && di.isPast && !isDone;
+
+    let rowClass = 'topic-row';
+    if (isDone)        rowClass += ' topic-row-done';
+    else if (isToday)  rowClass += ' topic-row-today';
+    else if (isMissed) rowClass += ' topic-row-missed';
+
     return `
-      <div class="topic-row ${isDone ? 'topic-row-done' : ''}" id="row-${day.topic.id}">
+      <div class="${rowClass}" id="row-${day.topic.id}">
         <div class="topic-row-main">
-          <span class="day-label">${day.label || ''}</span>
+          <div class="day-label${isToday ? ' day-today' : isMissed ? ' day-missed' : ''}">
+            <span class="day-name">${day.label || ''}</span>
+            ${di ? `<span class="day-date-label">${di.label}</span>` : ''}
+          </div>
           <span class="hours-pill" title="${hoursTitle}">${hours}</span>
           <label class="topic-check-label">
             <input type="checkbox" class="topic-check" data-topic-id="${day.topic.id}" ${isDone ? 'checked' : ''}>
@@ -689,6 +783,8 @@ const App = {
             </span>
           </label>
           <span class="topic-text ${isDone ? 'topic-text-done' : ''}">${day.topic.text}</span>
+          ${isToday && !isDone ? `<span class="day-status-badge badge-today">Today</span>` : ''}
+          ${isMissed ? `<span class="day-status-badge badge-catchup">Catch up</span>` : ''}
           ${hasNote ? `
             <button class="topic-expand-btn" data-topic-id="${day.topic.id}" title="Show learning notes">
               <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
@@ -707,89 +803,23 @@ const App = {
   renderTopicDetail(section) {
     const note = section.note;
     if (!note) return '';
-    const isProject = section.type === 'project';
     return `
       <div class="detail-inner">
-        <div class="detail-cols">
-          <div class="detail-main">
-            <div class="detail-section-tag">${section.title}</div>
-            ${note.learn && note.learn.length ? `
-              <div class="detail-block">
-                <div class="detail-block-title">
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.357l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/></svg>
-                  What to Learn
-                </div>
-                <ul class="detail-list">
-                  ${note.learn.map(item => `<li>${item}</li>`).join('')}
-                </ul>
-              </div>
-            ` : ''}
-            ${note.concepts && note.concepts.length ? `
-              <div class="detail-block">
-                <div class="detail-block-title">
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
-                  Key Concepts
-                </div>
-                <ul class="detail-list detail-list-concepts">
-                  ${note.concepts.map(item => `<li>${item}</li>`).join('')}
-                </ul>
-              </div>
-            ` : ''}
-            ${note.code && note.code.length ? `
-              <div class="detail-block">
-                <div class="detail-block-title">
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-                  Practice Tasks
-                </div>
-                <ol class="detail-list detail-list-code">
-                  ${note.code.map(item => `<li>${item}</li>`).join('')}
-                </ol>
-              </div>
-            ` : ''}
-          </div>
-          <div class="detail-sidebar">
-            <div class="daily-schedule">
-              <div class="daily-schedule-title">Daily Schedule</div>
-              ${isProject ? `
-                <div class="sch-row">
-                  <span class="sch-day">Mon – Fri</span>
-                  <div class="sch-split">
-                    <span class="sch-badge sch-read">Study 1.5h</span>
-                    <span class="sch-badge sch-build">Build 3.5h</span>
-                  </div>
-                  <span class="sch-time">5h</span>
-                </div>
-                <div class="sch-row">
-                  <span class="sch-day">Saturday</span>
-                  <span class="sch-badge sch-build">Build</span>
-                  <span class="sch-time">5h</span>
-                </div>
-                <div class="sch-row">
-                  <span class="sch-day">Sunday</span>
-                  <span class="sch-badge sch-deploy">Deploy</span>
-                  <span class="sch-time">5h</span>
-                </div>
-              ` : (() => {
-                const hasCoding = note.code && note.code.length > 0;
-                return `
-                <div class="sch-row">
-                  <span class="sch-day">Mon – Fri</span>
-                  <div class="sch-split">
-                    <span class="sch-badge sch-read">Read ${hasCoding ? '1.5h' : '3h'}</span>
-                    ${hasCoding ? `<span class="sch-badge sch-code">Code 1.5h</span>` : ''}
-                  </div>
-                  <span class="sch-time">3h</span>
-                </div>
-                <div class="sch-row">
-                  <span class="sch-day">Sat &amp; Sun</span>
-                  <span class="sch-badge sch-code">Coding</span>
-                  <span class="sch-time">5h</span>
-                </div>
-                `;
-              })()}
-            </div>
-          </div>
-        </div>
+        ${note.learn && note.learn.length ? `
+          <ul class="detail-list detail-section-learn">
+            ${note.learn.map(item => `<li>${item}</li>`).join('')}
+          </ul>
+        ` : ''}
+        ${note.concepts && note.concepts.length ? `
+          <ul class="detail-list detail-list-concepts detail-section-concepts">
+            ${note.concepts.map(item => `<li>${item}</li>`).join('')}
+          </ul>
+        ` : ''}
+        ${note.code && note.code.length ? `
+          <ol class="detail-list detail-list-code detail-section-code">
+            ${note.code.map(item => `<li>${item}</li>`).join('')}
+          </ol>
+        ` : ''}
       </div>
     `;
   },
@@ -812,6 +842,32 @@ const App = {
   },
 
   bindTopicEvents() {
+    // Week collapse/expand
+    document.querySelectorAll('.week-toggle-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const bodyId = header.dataset.weekBody;
+        const body = document.getElementById(bodyId);
+        const chevron = header.querySelector('.week-chevron');
+        if (!body) return;
+        const isOpen = !body.hidden;
+        body.hidden = isOpen;
+        if (chevron) chevron.classList.toggle('expanded', !isOpen);
+      });
+    });
+
+    // Daily plan toggle
+    document.querySelectorAll('.daily-plan-header').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const planId = btn.dataset.planBody;
+        const plan = document.getElementById(planId);
+        const chevron = btn.querySelector('.daily-plan-chevron');
+        if (!plan) return;
+        const isOpen = !plan.hidden;
+        plan.hidden = isOpen;
+        if (chevron) chevron.classList.toggle('rotated', !isOpen);
+      });
+    });
+
     // Checkbox toggling
     document.querySelectorAll('.topic-check').forEach(chk => {
       chk.addEventListener('change', () => {
@@ -867,8 +923,17 @@ const App = {
     document.querySelectorAll('.month-tab').forEach(tab => {
       const monthId = parseInt(tab.dataset.month);
       const mp = Storage.getMonthProgress(monthId);
-      const el = tab.querySelector('.tab-prog');
-      if (el) el.textContent = mp + '%';
+      let el = tab.querySelector('.tab-prog');
+      if (mp > 0) {
+        if (!el) {
+          el = document.createElement('span');
+          el.className = 'tab-prog';
+          tab.appendChild(el);
+        }
+        el.textContent = mp + '%';
+      } else if (el) {
+        el.remove();
+      }
     });
   },
 
@@ -896,7 +961,7 @@ const App = {
           <div class="settings-field">
             <label class="settings-label" for="settingStartDate">Roadmap Start Date</label>
             <input type="date" class="settings-input" id="settingStartDate" value="${s.startDate || ''}">
-            <div class="settings-hint">Used to calculate your current month and week</div>
+            <div class="settings-hint">Set to the Monday you start — every day in the roadmap will show its exact date. Missed days (past &amp; unchecked) will be highlighted so you can catch up.</div>
           </div>
           <button class="btn btn-primary" id="saveSettings">Save Profile</button>
         </div>
@@ -999,6 +1064,184 @@ const App = {
       });
     }
   },
+
+  /* ────────────────────────────────────────
+     RESOURCES
+  ──────────────────────────────────────── */
+  renderResources() {
+    const data = Storage.load();
+    const used = data.usedResources || [];
+    const categories = [...new Set(TOOLS_DATA.map(t => t.category))];
+
+    const renderCard = (tool) => {
+      const isUsed = used.includes(tool.id);
+      return `
+        <div class="tool-card ${isUsed ? 'tool-card-used' : ''}" data-id="${tool.id}" data-cat="${tool.category}">
+          <div class="tool-card-top">
+            <span class="tool-name">${tool.name}</span>
+            <button class="tool-used-btn ${isUsed ? 'tool-used-active' : ''}" data-id="${tool.id}">
+              ${isUsed ? `<svg viewBox="0 0 20 20" fill="currentColor" width="11" height="11"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Used` : 'Not Used'}
+            </button>
+          </div>
+          <p class="tool-what">${tool.what}</p>
+          <div class="tool-detail">
+            <div class="tool-detail-row"><span class="tool-dl">Why</span><span class="tool-dt">${tool.why}</span></div>
+            <div class="tool-detail-row"><span class="tool-dl">When</span><span class="tool-dt">${tool.when}</span></div>
+          </div>
+          <a class="tool-link" href="${tool.url}" target="_blank" rel="noopener noreferrer">Documentation →</a>
+        </div>
+      `;
+    };
+
+    const groupsHtml = categories.map(cat => {
+      const tools = TOOLS_DATA.filter(t => t.category === cat);
+      return `
+        <div class="tool-group" data-cat="${cat}">
+          <h3 class="tool-group-title">${cat}</h3>
+          <div class="tool-grid">
+            ${tools.map(renderCard).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const catPills = categories.map(c =>
+      `<button class="tool-cat-pill" data-cat="${c}">${c}</button>`
+    ).join('');
+
+    return `
+      <div class="page resources-page fade-in">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">AI Engineering Toolbox</h1>
+            <p class="page-subtitle">Tools and technologies you will use throughout the 6-month roadmap</p>
+          </div>
+        </div>
+
+        <div class="tool-controls">
+          <div class="res-search-wrap">
+            <svg class="res-search-icon" viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+            <input class="res-search" id="toolSearch" placeholder="Search tools..." autocomplete="off">
+          </div>
+          <div class="tool-filter-row">
+            <div class="tool-cat-pills">
+              <button class="tool-cat-pill active" data-cat="">All</button>
+              ${catPills}
+            </div>
+            <div class="res-status-btns">
+              <button class="res-status-btn active" data-status="all">All</button>
+              <button class="res-status-btn" data-status="used">Used</button>
+              <button class="res-status-btn" data-status="unused">Not Used</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="toolGroups">${groupsHtml}</div>
+        <div id="toolEmpty" class="res-empty" hidden>
+          <svg viewBox="0 0 20 20" fill="currentColor" width="32" height="32"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+          <p>No tools match your search.</p>
+          <button class="btn btn-outline" id="toolClearFilters">Clear Filters</button>
+        </div>
+      </div>
+    `;
+  },
+
+  bindResourcesEvents() {
+    let activeCat = '';
+    let activeStatus = 'all';
+
+    const applyFilters = () => {
+      const query = (document.getElementById('toolSearch')?.value || '').toLowerCase().trim();
+      const data = Storage.load();
+      const used = data.usedResources || [];
+
+      let visible = 0;
+      document.querySelectorAll('.tool-card').forEach(card => {
+        const id = card.dataset.id;
+        const cat = card.dataset.cat;
+        const tool = TOOLS_DATA.find(t => t.id === id);
+        if (!tool) return;
+
+        const matchesCat = !activeCat || cat === activeCat;
+        const isUsed = used.includes(id);
+        const matchesStatus =
+          activeStatus === 'all' ||
+          (activeStatus === 'used' && isUsed) ||
+          (activeStatus === 'unused' && !isUsed);
+        const matchesQuery = !query || `${tool.name} ${tool.what} ${tool.why} ${tool.when} ${tool.category}`.toLowerCase().includes(query);
+
+        const show = matchesCat && matchesStatus && matchesQuery;
+        card.hidden = !show;
+        if (show) visible++;
+      });
+
+      // Hide empty groups
+      document.querySelectorAll('.tool-group').forEach(group => {
+        const anyVisible = [...group.querySelectorAll('.tool-card')].some(c => !c.hidden);
+        group.hidden = !anyVisible;
+      });
+
+      const emptyEl = document.getElementById('toolEmpty');
+      if (emptyEl) emptyEl.hidden = visible > 0;
+    };
+
+    // Search
+    const searchEl = document.getElementById('toolSearch');
+    if (searchEl) {
+      let timer;
+      searchEl.addEventListener('input', () => {
+        clearTimeout(timer);
+        timer = setTimeout(applyFilters, 180);
+      });
+    }
+
+    // Category pills
+    document.querySelectorAll('.tool-cat-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.tool-cat-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        activeCat = pill.dataset.cat;
+        applyFilters();
+      });
+    });
+
+    // Status buttons
+    document.querySelectorAll('.res-status-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.res-status-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeStatus = btn.dataset.status;
+        applyFilters();
+      });
+    });
+
+    // Clear filters
+    document.getElementById('toolClearFilters')?.addEventListener('click', () => {
+      if (searchEl) searchEl.value = '';
+      activeCat = '';
+      activeStatus = 'all';
+      document.querySelectorAll('.tool-cat-pill').forEach(p => p.classList.toggle('active', p.dataset.cat === ''));
+      document.querySelectorAll('.res-status-btn').forEach(b => b.classList.toggle('active', b.dataset.status === 'all'));
+      applyFilters();
+    });
+
+    // Used toggle
+    document.querySelectorAll('.tool-used-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const isNowUsed = Storage.toggleUsed(id);
+        const card = btn.closest('.tool-card');
+        if (card) card.classList.toggle('tool-card-used', isNowUsed);
+        btn.classList.toggle('tool-used-active', isNowUsed);
+        btn.innerHTML = isNowUsed
+          ? `<svg viewBox="0 0 20 20" fill="currentColor" width="11" height="11"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Used`
+          : 'Not Used';
+        // Re-apply filters so status filter reflects new state
+        applyFilters();
+      });
+    });
+  },
+
 
   showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
